@@ -11,13 +11,18 @@ namespace Gluh.TechnicalTest
     {
         private readonly ISupplierService _supplierService;
 
+        public PurchaseOptimizer(ISupplierService supplierService)
+        {
+            _supplierService = supplierService;
+        }
+
         /// <summary>
         /// Calculates the optimal set of supplier to purchase products from.
         /// ### Complete this method
         /// </summary>
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {
-            
+            var suppliers = _supplierService.GetSuppliers(purchaseRequirements);
         }
     }
 }
