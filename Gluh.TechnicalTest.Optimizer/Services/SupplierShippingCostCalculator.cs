@@ -4,13 +4,13 @@ namespace Gluh.TechnicalTest.Services
 {
     public interface ISupplierShippingCostCalculator 
     {
-        decimal CalculateShippingCost(Supplier supplier, int quantityRequested);
+        decimal CalculateShippingCost(Supplier supplier, decimal quantityRequested);
     }
     public class SupplierShippingCostCalculator : ISupplierShippingCostCalculator
     {
-        public decimal CalculateShippingCost(Supplier supplier, int quantityRequested)
+        public decimal CalculateShippingCost(Supplier supplier, decimal quantityRequested)
         {
-            if (supplier.ShippingCostMinOrderValue >= quantityRequested && supplier.ShippingCostMaxOrderValue <= quantityRequested)
+            if (supplier.ShippingCostMinOrderValue <= quantityRequested && supplier.ShippingCostMaxOrderValue >= quantityRequested)
             {
                 return supplier.ShippingCost;
             }
