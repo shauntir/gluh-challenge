@@ -10,9 +10,10 @@ namespace Gluh.TechnicalTest
         static void Main(string[] args)
         {
             var supplierService = new SupplierService();
+            var supplierShippingCostCalculator = new SupplierShippingCostCalculator();
 
             var purchaseRequirements = new TestData().Create();
-            var purchaseOptimizer = new PurchaseOptimizer(supplierService);
+            var purchaseOptimizer = new PurchaseOptimizer(supplierService, supplierShippingCostCalculator);
 
             purchaseOptimizer.Optimize(purchaseRequirements);
 

@@ -10,10 +10,12 @@ namespace Gluh.TechnicalTest
     public class PurchaseOptimizer
     {
         private readonly ISupplierService _supplierService;
+        private readonly ISupplierShippingCostCalculator _supplierShippingCostCalculator;
 
-        public PurchaseOptimizer(ISupplierService supplierService)
+        public PurchaseOptimizer(ISupplierService supplierService, ISupplierShippingCostCalculator supplierShippingCostCalculator)
         {
             _supplierService = supplierService;
+            _supplierShippingCostCalculator = supplierShippingCostCalculator;
         }
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace Gluh.TechnicalTest
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {
             var suppliers = _supplierService.GetSuppliers(purchaseRequirements);
+
         }
     }
 }
