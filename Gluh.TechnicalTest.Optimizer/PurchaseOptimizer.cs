@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Gluh.TechnicalTest.Models;
-using Gluh.TechnicalTest.Database;
 using Gluh.TechnicalTest.Services;
+using System.Linq;
 
 namespace Gluh.TechnicalTest
 {
@@ -26,6 +24,25 @@ namespace Gluh.TechnicalTest
         {
             var suppliers = _supplierService.GetSuppliers(purchaseRequirements);
 
+            var x = suppliers.Select(s => new { s, t = _supplierShippingCostCalculator.CalculateShippingCost(s, 3) });
+
+            var purchaseRequirementWithSuppliers = purchaseRequirements.Select(p => new
+            {
+                PurchaseRequirement = p,
+                OurSuppliers = p.Product.Stock.Select(s => new
+                {
+                    SupplierName = s.Supplier.Name,
+                    ShippingCost = _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, p.Quantity),
+                    UnitByQuantityCost = p.Quantity * s.Cost,
+                    TotalCostIncludingShipping = (p.Quantity * s.Cost) + _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, p.Quantity)
+                })
+                .OrderBy(p => p.TotalCostIncludingShipping)
+                .ToList()
+            })
+            .ToList();
+
+
+            var calc = purchaseRequirementWithSuppliers;
         }
     }
 }
