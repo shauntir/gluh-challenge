@@ -5,25 +5,18 @@ using System.Linq;
 using Gluh.TechnicalTest;
 using Gluh.TechnicalTest.Models;
 using System.Collections.Generic;
-using Xunit.Extensions;
 using Gluh.TechnicalTest.Database;
 
 namespace GluhChallenge.Tests
 {
     public class SupplierShippingCostCalculatorTests
     {
-        private readonly List<PurchaseRequirement> _purchaseRequirements;
         public static List<object[]> SupplierData 
         {
             get 
             {
                 return new TestData().Create().SelectMany(x => x.Product.Stock).Select(y => new object[] { y.Supplier }).Distinct().ToList(); 
             }
-        }
-
-        public SupplierShippingCostCalculatorTests()
-        {
-            _purchaseRequirements = new TestData().Create();
         }
 
         [Theory, MemberData(nameof(SupplierData))]
