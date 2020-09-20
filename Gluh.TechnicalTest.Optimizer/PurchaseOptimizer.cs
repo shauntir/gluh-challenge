@@ -18,31 +18,50 @@ namespace Gluh.TechnicalTest
 
         /// <summary>
         /// Calculates the optimal set of supplier to purchase products from.
-        /// ### Complete this method
         /// </summary>
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {
-            var suppliers = _supplierService.GetSuppliers(purchaseRequirements);
-
-            var x = suppliers.Select(s => new { s, t = _supplierShippingCostCalculator.CalculateShippingCost(s, 3) });
-
             var purchaseRequirementWithSuppliers = purchaseRequirements.Select(p => new
             {
                 PurchaseRequirement = p,
-                OurSuppliers = p.Product.Stock.Select(s => new
+                SupplierFullfilment = p.Product.Stock.Select(s => new
                 {
+                    QuantityRequested = p.Quantity,
+                    ProductName = p.Product.Name,
+                    ProductType = p.Product.Type,
                     SupplierName = s.Supplier.Name,
-                    ShippingCost = _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, p.Quantity),
-                    UnitByQuantityCost = p.Quantity * s.Cost,
-                    TotalCostIncludingShipping = (p.Quantity * s.Cost) + _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, p.Quantity)
+                    ShippingCost = _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, GetStockQuantityAbleToSupply(s.StockOnHand, p.Quantity)),
+                    SupplierCost = s.Cost,
+                    TotalCostIncludingShipping = (p.Quantity * s.Cost) + _supplierShippingCostCalculator.CalculateShippingCost(s.Supplier, p.Quantity),
+                    StockOnHand = s.StockOnHand,
+                    StockAvailableToSupply = GetStockQuantityAbleToSupply(s.StockOnHand, p.Quantity)
                 })
-                .OrderBy(p => p.TotalCostIncludingShipping)
-                .ToList()
+            })
+            .Select(s => new 
+            {
+                PurchaseRequirement = s.PurchaseRequirement,
+                SupplierFullfilment = s.SupplierFullfilment.Select(x => new 
+                {
+                    QuantityRequested = x.QuantityRequested,
+                    ProductName = x.ProductName,
+                    ProductType = x.ProductType,
+                    SupplierName = x.SupplierName,
+                    ShippingCost = x.ShippingCost,
+                    SupplierCost = x.SupplierCost,
+                    StockOnHand = x.StockOnHand,
+                    StockAvailableToSupply = x.StockAvailableToSupply,
+                    UnitCostIncludingShipping = ((x.StockAvailableToSupply * x.SupplierCost) + x.ShippingCost) / (x.StockAvailableToSupply == 0 ? 1 : x.StockAvailableToSupply)
+                }).ToList()
             })
             .ToList();
 
 
             var calc = purchaseRequirementWithSuppliers;
+        }
+
+        private decimal GetStockQuantityAbleToSupply(decimal stockOnHand, decimal quantityRequested)
+        {
+            return stockOnHand < quantityRequested ? stockOnHand : quantityRequested;
         }
     }
 }
