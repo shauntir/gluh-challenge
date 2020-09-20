@@ -17,10 +17,7 @@ namespace Gluh.TechnicalTest.Models
 
         public override string ToString()
         {
-            return $"Required to fulfill a total of {PurchaseRequirement.Quantity} {PurchaseRequirement.Product.Name} " +
-                $"{Environment.NewLine}" +
-                $"Supplier {SupplierToFulfull.Name} can fulfill {QuantityFulfilled} at a cost of ${CostToFulfill}" +
-                $"{Environment.NewLine}";
+            return $"{SupplierToFulfull.Name} can fulfill {QuantityFulfilled} of {PurchaseRequirement.Quantity} for {PurchaseRequirement.Product.Name} at a cost of ${CostToFulfill}";
         }
     }
 }

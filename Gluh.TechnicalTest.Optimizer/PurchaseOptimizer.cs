@@ -8,11 +8,11 @@ namespace Gluh.TechnicalTest
 {
     public class PurchaseOptimizer
     {
-        private readonly IFulfillmentService _physicalProductFulfillmentService;
+        private readonly ICollection<IFulfillmentService> _allFulfillmentServices;
 
-        public PurchaseOptimizer(IFulfillmentService physicalProductFulfillmentService)
+        public PurchaseOptimizer(ICollection<IFulfillmentService> allFulfillmentServices)
         {
-            _physicalProductFulfillmentService = physicalProductFulfillmentService;
+            _allFulfillmentServices = allFulfillmentServices;
         }
 
         /// <summary>
@@ -20,11 +20,25 @@ namespace Gluh.TechnicalTest
         /// </summary>
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {
-            var result = _physicalProductFulfillmentService.GetPurchaseOrderItems(purchaseRequirements);
+            var purchaseOrderItems = _allFulfillmentServices.SelectMany(x => x.GetPurchaseOrderItems(purchaseRequirements));
+            var supplierPurchaserOrders = purchaseOrderItems
+                .GroupBy(x => x.SupplierToFulfull)
+                .Select(group => new PurchaseOrder
+                {
+                    Supplier = group.Key,
+                    PurchasOrderItems = group.ToList()
+                })
+                .ToList();
 
-            foreach (var item in result)
+
+            foreach (var purchaseOrder in supplierPurchaserOrders)
             {
-                Console.WriteLine(item);
+                Console.WriteLine($"Purchase order for {purchaseOrder.Supplier.Name}");
+                foreach (var item in purchaseOrder.PurchasOrderItems)
+                {
+                    Console.WriteLine(item);
+                }
+                Console.WriteLine();
             }
         }
     }
