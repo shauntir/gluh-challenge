@@ -1,5 +1,6 @@
 ﻿using Gluh.TechnicalTest.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gluh.TechnicalTest.Services
 {
@@ -20,6 +21,18 @@ namespace Gluh.TechnicalTest.Services
         public IEnumerable<PurchaseOrderItem> ProducePurchaseOrderItem(List<SupplierFulfillmentOptions> fulfillmentOptions, PurchaseRequirement purchaseRequirement)
         {
             var quantityNeeded = purchaseRequirement.Quantity;
+
+            if (fulfillmentOptions.Count() == 0)
+            {
+                yield return new PurchaseOrderItem
+                {
+                    PurchaseRequirement = purchaseRequirement,
+                    QuantityFulfilled = quantityNeeded,
+                    UnableToFulfill = true,
+                    CostToFulfill = 0
+                };
+            }
+
             foreach (var option in fulfillmentOptions)
             {
                 if (_stockCalculatorService.QuantityLeftToFulfill(quantityNeeded, (int)option.StockAvailableToSupply) == 0)

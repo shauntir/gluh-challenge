@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Gluh.TechnicalTest.Services
 {
-    public class PhysicalProductFulfillmentService : IFulfillmentService
+    public class ProductFulfillmentService : IFulfillmentService
     {
         private readonly ISupplierService _supplierService;
         private readonly ISupplierShippingCostCalculator _supplierShippingCostCalculator;
         private readonly PurchaseOrderFulfillmentService _purchaseOrderFulfillmentService;
 
-        public PhysicalProductFulfillmentService(ISupplierService supplierService, 
+        public ProductFulfillmentService(ISupplierService supplierService, 
             ISupplierShippingCostCalculator supplierShippingCostCalculator,
             PurchaseOrderFulfillmentService purchaseOrderFulfillmentService)
         {
@@ -22,7 +22,7 @@ namespace Gluh.TechnicalTest.Services
         public List<PurchaseOrderItem> GetPurchaseOrderItems(List<PurchaseRequirement> purchaseRequirements)
         {
             var result = purchaseRequirements
-                .Where(s => s.Product.Type == Database.ProductType.Physical)
+                .Where(s => s.Product.Type != Database.ProductType.Service)
                 .Select(purchaseRequirement => new
                 {
                     PurchaseRequirement = purchaseRequirement,
@@ -38,7 +38,9 @@ namespace Gluh.TechnicalTest.Services
                 .Select(supplierStock => new PurchaseRequirementFulfillmentOptions
                 {
                     PurchaseRequirement = supplierStock.PurchaseRequirement,
-                    OptionsList = supplierStock.SupplierFullfilment.Select(fulfullment => new SupplierFulfillmentOptions
+                    OptionsList = supplierStock.SupplierFullfilment
+                    .Where(fulfullment => fulfullment.StockOnHand > 0)
+                    .Select(fulfullment => new SupplierFulfillmentOptions
                     {
                         Supplier = fulfullment.Supplier,
                         ShippingCost = fulfullment.ShippingCost,

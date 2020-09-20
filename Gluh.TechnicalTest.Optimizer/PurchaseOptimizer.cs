@@ -30,14 +30,14 @@ namespace Gluh.TechnicalTest
                 })
                 .ToList();
 
-
             foreach (var purchaseOrder in supplierPurchaserOrders)
             {
-                Console.WriteLine($"Purchase order for {purchaseOrder.Supplier.Name}");
+                Console.WriteLine($"------------- Purchase order -------------");
                 foreach (var item in purchaseOrder.PurchasOrderItems)
                 {
                     Console.WriteLine(item);
                 }
+                Console.WriteLine($"------------------------------------------");
                 Console.WriteLine();
             }
         }

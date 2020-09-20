@@ -17,11 +17,11 @@ namespace Gluh.TechnicalTest
             var stockCalculatorService = new StockCalculatorService();
             var purchaseOrderFulfillmentService = new PurchaseOrderFulfillmentService(stockCalculatorService);
 
-            var physicalProductFulfillmentService = new PhysicalProductFulfillmentService(supplierService, supplierShippingCostCalculator, purchaseOrderFulfillmentService);
+            var productFulfillmentService = new ProductFulfillmentService(supplierService, supplierShippingCostCalculator, purchaseOrderFulfillmentService);
             var serviceTypeFulfillmentService = new ServiceTypeFulfillmentService();
-            
+
             // Optimize and generate purchas orders for suppliers to fulfill
-            var purchaseOptimizer = new PurchaseOptimizer(new List<IFulfillmentService>() { physicalProductFulfillmentService, serviceTypeFulfillmentService });
+            var purchaseOptimizer = new PurchaseOptimizer(new List<IFulfillmentService>() { serviceTypeFulfillmentService, productFulfillmentService });
             purchaseOptimizer.Optimize(purchaseRequirements);
 
             Console.Read();

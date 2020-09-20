@@ -20,7 +20,7 @@ namespace Gluh.TechnicalTest.Services
                     CostToFulfill = 0m,
                     SelfFulfillment = true,
                     QuantityFulfilled = purchaseRequirement.Quantity,
-                    SupplierToFulfull = new Database.Supplier { Name = "Company" }
+                    SupplierToFulfull = new Database.Supplier { Name = "This company" }
                 })
                 .ToList();
 
