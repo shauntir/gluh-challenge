@@ -17,6 +17,10 @@ namespace Gluh.TechnicalTest
 
         /// <summary>
         /// Calculates the optimal set of supplier to purchase products from.
+        /// Assumptions:
+        /// * The "Professional Services - 1 hour" product is assumed to be provided by the company that provides the retail front store and not their suppliers. No cost is assigned to this service.
+        /// * Non physical products do not incur any delivery costs
+        /// * Products that do not have sufficient stock is listed as a purchase order but as unable to fulfill
         /// </summary>
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {

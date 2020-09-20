@@ -20,7 +20,7 @@ namespace Gluh.TechnicalTest
             var productFulfillmentService = new ProductFulfillmentService(supplierService, supplierShippingCostCalculator, purchaseOrderFulfillmentService);
             var serviceTypeFulfillmentService = new ServiceTypeFulfillmentService();
 
-            // Optimize and generate purchas orders for suppliers to fulfill
+            // Optimize and generate purchase orders for suppliers to fulfill
             var purchaseOptimizer = new PurchaseOptimizer(new List<IFulfillmentService>() { serviceTypeFulfillmentService, productFulfillmentService });
             purchaseOptimizer.Optimize(purchaseRequirements);
 
