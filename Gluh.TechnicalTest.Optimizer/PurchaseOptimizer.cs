@@ -2,14 +2,15 @@
 using Gluh.TechnicalTest.Models;
 using Gluh.TechnicalTest.Services;
 using System.Linq;
+using System;
 
 namespace Gluh.TechnicalTest
 {
     public class PurchaseOptimizer
     {
-        private readonly IPhysicalProductFulfillmentService _physicalProductFulfillmentService;
+        private readonly IFulfillmentService _physicalProductFulfillmentService;
 
-        public PurchaseOptimizer(IPhysicalProductFulfillmentService physicalProductFulfillmentService)
+        public PurchaseOptimizer(IFulfillmentService physicalProductFulfillmentService)
         {
             _physicalProductFulfillmentService = physicalProductFulfillmentService;
         }
@@ -19,9 +20,12 @@ namespace Gluh.TechnicalTest
         /// </summary>
         public void Optimize(List<PurchaseRequirement> purchaseRequirements)
         {
-            var result = _physicalProductFulfillmentService.GetAllPurchaseRequirementFulfillmentOptions(purchaseRequirements);
+            var result = _physicalProductFulfillmentService.GetPurchaseOrderItems(purchaseRequirements);
 
-            
+            foreach (var item in result)
+            {
+                Console.WriteLine(item);
+            }
         }
     }
 }

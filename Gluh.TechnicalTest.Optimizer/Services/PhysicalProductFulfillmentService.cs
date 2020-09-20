@@ -1,18 +1,10 @@
-﻿using Gluh.TechnicalTest.Database;
-using Gluh.TechnicalTest.Models;
-using System;
+﻿using Gluh.TechnicalTest.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gluh.TechnicalTest.Services
 {
-    public interface IPhysicalProductFulfillmentService
-    {
-        List<PurchaseRequirementFulfillmentOptions> GetAllPurchaseRequirementFulfillmentOptions(List<PurchaseRequirement> purchaseRequirements);
-    }
-
-    public class PhysicalProductFulfillmentService : IPhysicalProductFulfillmentService
+    public class PhysicalProductFulfillmentService : IFulfillmentService
     {
         private readonly ISupplierService _supplierService;
         private readonly ISupplierShippingCostCalculator _supplierShippingCostCalculator;
@@ -23,7 +15,31 @@ namespace Gluh.TechnicalTest.Services
             _supplierShippingCostCalculator = supplierShippingCostCalculator;
         }
 
-        public List<PurchaseRequirementFulfillmentOptions> GetAllPurchaseRequirementFulfillmentOptions(List<PurchaseRequirement> purchaseRequirements)
+        private int QuantityLeftToFulfill(int currentQuantityToFulfill, int stockAvailableToFulfill)
+        {
+            if (currentQuantityToFulfill - stockAvailableToFulfill <= 0)
+            {
+                return 0;
+            }
+
+            return currentQuantityToFulfill - stockAvailableToFulfill;
+        }
+
+        private IEnumerable<PurchaseOrderItem> ProducePurchaseOrderItem(int quantityNeeded, List<SupplierFulfillmentOptions> fulfillmentOptions, PurchaseRequirement purchaseRequirement)
+        {
+            foreach (var option in fulfillmentOptions)
+            {
+                if (QuantityLeftToFulfill(quantityNeeded, (int)option.StockAvailableToSupply) == 0)
+                {
+                    yield return new PurchaseOrderItem { PurchaseRequirement = purchaseRequirement, QuantityFulfilled = quantityNeeded, SelfFulfillment = false, SupplierToFulfull = option.Supplier, CostToFulfill = (option.SupplierCost * quantityNeeded) + option.ShippingCost };
+                    yield break;
+                }
+                quantityNeeded -= (int)option.StockAvailableToSupply;
+                yield return new PurchaseOrderItem { PurchaseRequirement = purchaseRequirement, QuantityFulfilled = (int)option.StockAvailableToSupply, SelfFulfillment = false, SupplierToFulfull = option.Supplier, CostToFulfill = (option.SupplierCost * option.StockAvailableToSupply) + option.ShippingCost };
+            }
+        }
+
+        public List<PurchaseOrderItem> GetPurchaseOrderItems(List<PurchaseRequirement> purchaseRequirements)
         {
             var result = purchaseRequirements
                 .Where(s => s.Product.Type == Database.ProductType.Physical)
@@ -54,6 +70,9 @@ namespace Gluh.TechnicalTest.Services
                     .OrderBy(x => x.UnitCostIncludingShipping)
                     .ToList()
                 })
+                .SelectMany(requirementOption =>
+                    ProducePurchaseOrderItem(requirementOption.PurchaseRequirement.Quantity, requirementOption.OptionsList, requirementOption.PurchaseRequirement)
+                )
                 .ToList();
 
             return result;
