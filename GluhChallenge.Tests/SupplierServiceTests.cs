@@ -25,10 +25,10 @@ namespace GluhChallenge.Tests
             var supplierService = new SupplierService();
 
             // Act
-            var result = supplierService.GetSuppliers(_purchaseRequirements);
+            var result = supplierService.GetStockQuantityAbleToSupply(5, 10);
 
             // Assert
-            Assert.Equal(6, result.Count());
+            Assert.Equal(5, result);
         }
     }
 }

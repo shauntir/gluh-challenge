@@ -1,20 +1,24 @@
-﻿using Gluh.TechnicalTest.Database;
-using Gluh.TechnicalTest.Models;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 
 namespace Gluh.TechnicalTest.Services
 {
     public interface ISupplierService
     {
-        List<Supplier> GetSuppliers(List<PurchaseRequirement> purchaseRequirements);
+        decimal GetStockQuantityAbleToSupply(decimal stockOnHand, decimal quantity);
+
+        decimal CalculateUnitCostIncludingShipping(decimal stockAvailableToSupply, decimal supplierCost, decimal shippingCost);
     }
 
     public class SupplierService : ISupplierService
     {
-        public List<Supplier> GetSuppliers(List<PurchaseRequirement> purchaseRequirements)
+        public decimal GetStockQuantityAbleToSupply(decimal stockOnHand, decimal quantityRequested)
         {
-            return purchaseRequirements.SelectMany(x => x.Product.Stock).Select(y => y.Supplier).Distinct().ToList();
+            return Math.Min(stockOnHand, quantityRequested);
+        }
+
+        public decimal CalculateUnitCostIncludingShipping(decimal stockAvailableToSupply, decimal supplierCost, decimal shippingCost)
+        {
+            return ((stockAvailableToSupply * supplierCost) + shippingCost) / stockAvailableToSupply;
         }
     }
 }
