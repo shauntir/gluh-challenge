@@ -19,7 +19,7 @@ namespace Gluh.TechnicalTest.Models
         {
             return $"Required to fulfill a total of {PurchaseRequirement.Quantity} {PurchaseRequirement.Product.Name} " +
                 $"{Environment.NewLine}" +
-                $"Supplier {SupplierToFulfull.Name} can fulfill {QuantityFulfilled}" +
+                $"Supplier {SupplierToFulfull.Name} can fulfill {QuantityFulfilled} at a cost of ${CostToFulfill}" +
                 $"{Environment.NewLine}";
         }
     }

@@ -13,7 +13,10 @@ namespace Gluh.TechnicalTest
 
             var supplierService = new SupplierService();
             var supplierShippingCostCalculator = new SupplierShippingCostCalculator();
-            var physicalProductFulfillmentService = new PhysicalProductFulfillmentService(supplierService, supplierShippingCostCalculator);
+            var stockCalculatorService = new StockCalculatorService();
+            var purchaseOrderFulfillmentService = new PurchaseOrderFulfillmentService(stockCalculatorService);
+
+            var physicalProductFulfillmentService = new PhysicalProductFulfillmentService(supplierService, supplierShippingCostCalculator, purchaseOrderFulfillmentService);
             var serviceTypeFulfillmentService = new ServiceTypeFulfillmentService();
             
 

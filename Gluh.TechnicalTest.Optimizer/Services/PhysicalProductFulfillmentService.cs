@@ -8,35 +8,15 @@ namespace Gluh.TechnicalTest.Services
     {
         private readonly ISupplierService _supplierService;
         private readonly ISupplierShippingCostCalculator _supplierShippingCostCalculator;
+        private readonly PurchaseOrderFulfillmentService _purchaseOrderFulfillmentService;
 
-        public PhysicalProductFulfillmentService(ISupplierService supplierService, ISupplierShippingCostCalculator supplierShippingCostCalculator)
+        public PhysicalProductFulfillmentService(ISupplierService supplierService, 
+            ISupplierShippingCostCalculator supplierShippingCostCalculator,
+            PurchaseOrderFulfillmentService purchaseOrderFulfillmentService)
         {
             _supplierService = supplierService;
             _supplierShippingCostCalculator = supplierShippingCostCalculator;
-        }
-
-        private int QuantityLeftToFulfill(int currentQuantityToFulfill, int stockAvailableToFulfill)
-        {
-            if (currentQuantityToFulfill - stockAvailableToFulfill <= 0)
-            {
-                return 0;
-            }
-
-            return currentQuantityToFulfill - stockAvailableToFulfill;
-        }
-
-        private IEnumerable<PurchaseOrderItem> ProducePurchaseOrderItem(int quantityNeeded, List<SupplierFulfillmentOptions> fulfillmentOptions, PurchaseRequirement purchaseRequirement)
-        {
-            foreach (var option in fulfillmentOptions)
-            {
-                if (QuantityLeftToFulfill(quantityNeeded, (int)option.StockAvailableToSupply) == 0)
-                {
-                    yield return new PurchaseOrderItem { PurchaseRequirement = purchaseRequirement, QuantityFulfilled = quantityNeeded, SelfFulfillment = false, SupplierToFulfull = option.Supplier, CostToFulfill = (option.SupplierCost * quantityNeeded) + option.ShippingCost };
-                    yield break;
-                }
-                quantityNeeded -= (int)option.StockAvailableToSupply;
-                yield return new PurchaseOrderItem { PurchaseRequirement = purchaseRequirement, QuantityFulfilled = (int)option.StockAvailableToSupply, SelfFulfillment = false, SupplierToFulfull = option.Supplier, CostToFulfill = (option.SupplierCost * option.StockAvailableToSupply) + option.ShippingCost };
-            }
+            _purchaseOrderFulfillmentService = purchaseOrderFulfillmentService;
         }
 
         public List<PurchaseOrderItem> GetPurchaseOrderItems(List<PurchaseRequirement> purchaseRequirements)
@@ -71,7 +51,7 @@ namespace Gluh.TechnicalTest.Services
                     .ToList()
                 })
                 .SelectMany(requirementOption =>
-                    ProducePurchaseOrderItem(requirementOption.PurchaseRequirement.Quantity, requirementOption.OptionsList, requirementOption.PurchaseRequirement)
+                    _purchaseOrderFulfillmentService.ProducePurchaseOrderItem(requirementOption.OptionsList, requirementOption.PurchaseRequirement)
                 )
                 .ToList();
 
